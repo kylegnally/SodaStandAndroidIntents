@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="?android:listSeparatorTextViewStyle">
+
+    <TextView
+        android:id="@+id/list_item_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:padding="4dp"
+        android:textSize="8pt"
+        tools:text="Beverage Name" />
+
+    <TextView
+        android:id="@+id/list_item_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_item_name"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:padding="4dp"
+        android:textSize="8pt"
+        tools:text="Beverage Price" />
+
+    <TextView
+        android:id="@+id/list_item_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_item_name"
+        android:layout_alignParentLeft="@+id/list_item_price"
+        android:layout_alignParentStart="@+id/list_item_price"
+        android:textSize="8pt"
+        android:padding="4dp"
+        tools:text="Beverage Id" />
+
+
+</RelativeLayout>
