@@ -3,6 +3,7 @@ package edu.kvcc.cis298.cis298assignment4;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -36,6 +37,10 @@ public class WineShop {
     private WineShop(Context context) {
          mWines = new ArrayList<>();
      }
+
+    public void setWines(ArrayList<WineItem> wines) {
+        mWines = wines;
+    }
 
 
     // method to add a single item to the ArrayList above. This will add

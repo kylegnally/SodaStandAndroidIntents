@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CIS298Assignment3</string>
+    <string name="app_name">CIS298Assignment4</string>
     <string name="action_settings">Settings</string>
     <string name="wine_name_label">Details</string>
     <string name="wine_id_label">Id:</string>

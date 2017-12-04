@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,16 @@ public class WineListFragment extends Fragment {
     private WineAdapter mAdapter;
     private WineShop mWineList;
     private Context mContext;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //setHasOptionsMenu(true);
+
+        // starts the new task on a new thread
+        new FetchWinesTask().execute();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,7 +74,7 @@ public class WineListFragment extends Fragment {
 
         // and then call the getWines() method of the singleton's instance to
         // get the wines, which we assign to the list
-        List<WineItem> wines = wineShop.getWines();
+        ArrayList<WineItem> wines = wineShop.getWines();
 
         // if the adapter is null
         if (mAdapter == null) {
@@ -83,6 +94,20 @@ public class WineListFragment extends Fragment {
         }
 
     }
+
+    private void setupAdapter(ArrayList<WineItem> wines) {
+
+        // check to see if the RecyclerView had been added to the fragment
+        if (isAdded()) {
+            //Make a new adapter for the Recycler View and send over
+            //the crime List
+            mAdapter = new WineAdapter(wines);
+
+            //Set the adapter on the Recycler View
+            mWineRecyclerView.setAdapter(mAdapter);
+        }
+    }
+
 
     // this is our ViewHolder. It expects a TextView and references that view.
     // Since it is an interface, we will need to implement all its methods
@@ -137,7 +162,7 @@ public class WineListFragment extends Fragment {
 
         private List<WineItem> mWines;
 
-        public WineAdapter(List<WineItem> wine) {
+        public WineAdapter(ArrayList<WineItem> wine) {
 
             mWines = wine;
 
@@ -174,11 +199,18 @@ public class WineListFragment extends Fragment {
 
     }
 
-    private class FetchWinesTask extends AsyncTask<Void,Void,List<WineItem>> {
+    private class FetchWinesTask extends AsyncTask<Void,Void,ArrayList<WineItem>> {
 
         @Override
-        protected List<WineItem> doInBackground(Void... voids) {
+        protected ArrayList<WineItem> doInBackground(Void... voids) {
             return new WineFetcher().fetchWines();
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<WineItem> wineItems) {
+            WineShop shop = WineShop.get(getActivity());
+            shop.setWines(wineItems);
+            setupAdapter(wineItems);
         }
     }
 }

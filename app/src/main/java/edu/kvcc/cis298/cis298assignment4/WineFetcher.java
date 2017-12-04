@@ -76,11 +76,11 @@ public class WineFetcher {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public List<WineItem> fetchWines() {
+    public ArrayList<WineItem> fetchWines() {
 
         // make a new local list of crimes to hold what we parse
         // from the returned JSON string
-        List<WineItem> wines = new ArrayList<>();
+        ArrayList<WineItem> wines = new ArrayList<>();
         try {
             String url = Uri.parse("http://barnesbrothers.homeserver.com/beverageapi/")
                     .buildUpon()
@@ -106,7 +106,7 @@ public class WineFetcher {
         return wines;
     }
 
-    private void parseWines(List<WineItem> wines, JSONArray jsonArray) throws IOException, JSONException {
+    private void parseWines(ArrayList<WineItem> wines, JSONArray jsonArray) throws IOException, JSONException {
         // loop through all the elements in the array that was sent
         // into this method
         for (int i = 0; i < jsonArray.length(); i++) {
