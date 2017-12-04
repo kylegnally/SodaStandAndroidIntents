@@ -6,36 +6,41 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 /**
- * Created by David Barnes on 11/3/2015.
- * Class that contains some reusable code for activities that use a single fragment
+ * Created by kyleg on 11/9/2017.
  */
+
+    // A generic activity for hosting a single fragment. It is abstract, so it
+    // cannot be instantiated
 public abstract class SingleFragmentActivity extends FragmentActivity {
 
+    // abstract method for creating a fragment that can be hosted
+    // in its activity. All child activities must implement this method.
+    protected abstract Fragment createFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //set the content to the activity_fragment layout
+
+        // set the View we will use for the fragment
         setContentView(R.layout.activity_fragment);
 
-        //create a new fragment manager, which is required to attach a new fragment
+        // create a FragmentManager. We use the one in Support
         FragmentManager fm = getSupportFragmentManager();
 
-        //find the fragment that is already in teh container. Might be null.
+        // create a Fragment and send it the Id of the framelayout.
+        // The first time it is run, there will be nothing there...
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
-        //if the fragment is null, we can create a new one and add it to the container
+        // ... so we check for null. The first time it is run, it will be null, and
+        // will create a new fragment. We only need to do this once...
         if (fragment == null) {
-            //create the fragment
+
+            // ...because we only create the fragment once (on the first run).
             fragment = createFragment();
-            //start a transaction to put it in the container
-            fm.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit(); //must commit the transaction to make it complete
+
+            // Use the BeginTransaction() method in the fragmentmanager, adding
+            // the fragment into the framelayout, and then call commit()
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
     }
-
-    //Define a abstract method that must be overridden in child classes to return a fragment to use.
-    protected abstract Fragment createFragment();
-
 }
