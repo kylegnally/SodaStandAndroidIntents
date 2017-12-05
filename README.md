@@ -8,14 +8,14 @@
 
 This assignment will require you to either update my version of assignment 3, or your own version. This repository comes with my finished version of assignment 3. If you would rather use your version, you must replace all of the files in this project with your files. This way you can still make a pull request to submit the assignment.
 
-Once a user is on the detail page for a beverage item, there should be two additional buttons added that can be pressed. A Select Contact Button, and a Send Email button. The Select Contact button will allow a user to select a contact from the contacts application. The Send Email button will allow the user to send an email to the contact that was selected.
+Once a user is on the detail page for a beverage item, there should be two additional buttons added that can be pressed. A Select Contact Button, and a Send Email button. The Select Contact button will allow a user to select a contactName from the contacts application. The Send Email button will allow the user to send an email to the contactName that was selected.
 
-If the device has a default Contacts App, then the Select Contact button should be enabled, and the Send Email button disabled until a contact is selected. If the application does not have a default Contacts App, the application should disable the Select Contacts button and enable the Send Email button. If it is the case where a contacts app does not exist, the user should still be able to send an email, however there will be no way to pre-populate the 'to' field nor personalize it.
+If the device has a default Contacts App, then the Select Contact button should be enabled, and the Send Email button disabled until a contactName is selected. If the application does not have a default Contacts App, the application should disable the Select Contacts button and enable the Send Email button. If it is the case where a contacts app does not exist, the user should still be able to send an email, however there will be no way to pre-populate the 'to' field nor personalize it.
 
-When clicking the Select Contact button, the app should launch the default contacts app and allow the user to select a contact to send a email to.
-When clicking the Send Email button, the app should take the email address of the selected user, and use that as the recipient for the email. The email should have a Subject auto-generated based on a pre-defined message. The body of the email should address the contact that was selected by using the contacts name. This will help personalize the message. Lastly, the email body should also contain all of the information about the specific item.
+When clicking the Select Contact button, the app should launch the default contacts app and allow the user to select a contactName to send a email to.
+When clicking the Send Email button, the app should take the email address of the selected user, and use that as the recipient for the email. The email should have a Subject auto-generated based on a pre-defined message. The body of the email should address the contactName that was selected by using the contacts name. This will help personalize the message. Lastly, the email body should also contain all of the information about the specific item.
 
-In addition to adding the Implicit Intents to select a contact and send an email, the app must now load it's data from a remote web service vs. loading it from the CSV file.
+In addition to adding the Implicit Intents to select a contactName and send an email, the app must now load it's data from a remote web service vs. loading it from the CSV file.
 
 The exact same data can be pulled by making a HTTP request to the following URL. If you would like to see what gets returned, you can simply type the following URL into a web browser and see what gets returned.
 
@@ -37,7 +37,7 @@ Solution Requirements:
 * Add button for Selecting a Contact
 * Add button for Sending and Email
 * Proper disabled / enable of buttons based on above description
-* Pull email address from contact
+* Pull email address from contactName
 * Auto-generate the email to, subject, and body
 * Load Beverage data from HTTP web service
 
@@ -52,13 +52,13 @@ You will need to add a permission to use contacts to the Android Manifest file. 
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-The book does not cover how to pull the email address of a contact. It is a little more work than just the name. It requires making two queries to the contacts database. This stackoverflow answer should help you figure out what you need to do to get the email address for a contact. Because we are requesting data from a contacts 'database', a lot of the syntax is similar to what is done when interacting with SQLite.
+The book does not cover how to pull the email address of a contactName. It is a little more work than just the name. It requires making two queries to the contacts database. This stackoverflow answer should help you figure out what you need to do to get the email address for a contactName. Because we are requesting data from a contacts 'database', a lot of the syntax is similar to what is done when interacting with SQLite.
 
-http://stackoverflow.com/questions/10117049/get-only-email-address-from-contact-list-android
+http://stackoverflow.com/questions/10117049/get-only-email-address-from-contactName-list-android
 
 You will also need to add permission to the manifest to allow access to the Internet. The book DOES cover this.
 
-You will probably need to add an email account and a contact to your virtual device in order to test this functionality.
+You will probably need to add an email account and a contactName to your virtual device in order to test this functionality.
 
 ## Grading
 | Feature                           | Points |

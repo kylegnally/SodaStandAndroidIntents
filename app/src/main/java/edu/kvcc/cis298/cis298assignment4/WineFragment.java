@@ -1,16 +1,25 @@
 package edu.kvcc.cis298.cis298assignment4;
 
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -22,11 +31,17 @@ public class WineFragment extends Fragment {
     // string we will use to store the wine Id extra
     private static final String ARG_WINE_ID = "wine_id";
 
+    // constant for contact request code
+    private static final int REQUEST_CONTACT = 1;
+
     // Where are the variables to store our widgets??? They can be
     // converted to local variables! See below
 
     // variable to hold an instance of the WineItem object
     private WineItem mWine;
+
+    private Button mContactButton;
+    private Button mSendEmailButton;
 
     // WineFragment newInstance() method that will be
     // called when we need a new fragment
@@ -181,7 +196,101 @@ public class WineFragment extends Fragment {
             }
         });
 
+        final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+        mContactButton = (Button) v.findViewById(R.id.select_contact_button);
+        mContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(pickContact, REQUEST_CONTACT);
+            }
+        });
+
+        if (mWine.getContactName() != null) {
+            mContactButton.setText(mWine.getContactName());
+        }
+
+        mSendEmailButton = (Button) v.findViewById(R.id.send_email_button);
+        mSendEmailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("text/plain");
+                i.putExtra(Intent.EXTRA_TEXT, getWineReport());
+                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
+                i = Intent.createChooser(i, getString(R.string.send_report));
+            }
+        });
+
         // return the view
         return v;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        } else if (requestCode == REQUEST_CONTACT && data != null) {
+            getNameEmailDetails();
+//            Uri contactUri = data.getData();
+//
+//            // Specify which fields we want to return data for
+//            String[] queryFields = new String[] {
+//
+//                    ContactsContract.Contacts.DISPLAY_NAME,
+//
+//            };
+//
+//            Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
+//
+//
+//            try {
+//                if (c.getCount() == 0) {
+//                    return;
+//                }
+//
+//                c.moveToFirst();
+//                while (!c.isAfterLast()) {
+//                    String contact = c.getString(0);
+//                    mWine.setContactName(contact);
+//                    //mWine.setContactEmail(email);
+//                    mContactButton.setText(contact);
+//                    //mSendEmailButton.setText(email);
+//                }
+//
+//            } finally {
+//                c.close();
+//            }
+        }
+    }
+
+    public void getNameEmailDetails(){
+        Cursor cur = getActivity().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
+        if (cur.getCount() > 0) {
+            while (cur.moveToNext()) {
+                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
+                Cursor cur1 = getActivity().getContentResolver().query(
+                        ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                        new String[]{id}, null);
+                while (cur1.moveToNext()) {
+                    String name=cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+                    mWine.setContactName(name);
+                    mContactButton.setText(name);
+                    String email = cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
+                    mWine.setContactEmail(email);
+                    mSendEmailButton.setText(email);
+                }
+                cur1.close();
+            }
+        }
+    }
+
+    private String getWineReport() {
+
+        String contact = mWine.getContactName();
+        String wineReport = getString(R.string.wine_report, mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mWine.isActive());
+        return wineReport;
+
+    }
+
 }
