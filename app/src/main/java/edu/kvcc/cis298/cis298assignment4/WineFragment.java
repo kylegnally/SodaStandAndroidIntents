@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -208,10 +209,6 @@ public class WineFragment extends Fragment {
             }
         });
 
-        if (mWine.getContactName() != null) {
-            mContactButton.setText(mWine.getContactName());
-        }
-
         PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mContactButton.setEnabled(false);
@@ -223,17 +220,17 @@ public class WineFragment extends Fragment {
             public void onClick(View view) {
 
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", contactEmail, null));
+                Resources emailResources = getResources();
+                String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mWine.isActive());
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
-                emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.wine_report));
+                emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
                 startActivity(Intent.createChooser(emailIntent, "Send report via: "));
-
-//                Intent i = new Intent(Intent.ACTION_SEND);
-//                i.setType("text/plain");
-//                i.putExtra(Intent.EXTRA_TEXT, getWineReport());
-//                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
-//                i = Intent.createChooser(i, getString(R.string.send_report));
             }
         });
+
+        if (mWine.getContactName() == null) {
+            mSendEmailButton.setEnabled(false);
+        }
 
         // return the view
         return v;
@@ -292,6 +289,9 @@ public class WineFragment extends Fragment {
                 mWine.setContactName(contact);
                 mContactButton.setText(contact);
                 mSendEmailButton.setText(contactEmail);
+                if (mWine.getContactName() != null) {
+                    mSendEmailButton.setEnabled(true);
+                }
             } catch (Exception e) {
                 Log.e("Crime", e.getMessage() + e.getStackTrace());
             } finally {
@@ -304,13 +304,4 @@ public class WineFragment extends Fragment {
             }
         }
     }
-
-    private String getWineReport() {
-
-        String contact = mWine.getContactName();
-        String wineReport = getString(R.string.wine_report, mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mWine.isActive());
-        return wineReport;
-
-    }
-
 }

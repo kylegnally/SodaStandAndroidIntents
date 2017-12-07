@@ -9,7 +9,8 @@
     <string name="dollar_sign">$</string>
     <string name="select_contact">Select Contact</string>
     <string name="send_email">Send Email</string>
-    <string name="wine_report">%1$s: Id: %2$s Name: %3$s Pack: %4$s Price: %5$s Active: %6$b</string>
+    <string name="wine_report">%1$s, \n\nPlease verify the following WineList report:\n\nId: %2$s \nName: %3$s \nPack: %4$s \nPrice: %5$s \nActive: %6$b\n\nThanks!</string>
     <string name="wine_report_subject">WineList Wine Report</string>
     <string name="send_report">Send WineList report via</string>
+    <string name="verify_report">Pleasw verify the following WineList report:\n \n</string>
 </resources>
