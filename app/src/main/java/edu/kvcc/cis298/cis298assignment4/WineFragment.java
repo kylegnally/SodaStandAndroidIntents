@@ -1,8 +1,10 @@
 package edu.kvcc.cis298.cis298assignment4;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,6 +44,7 @@ public class WineFragment extends Fragment {
 
     private Button mContactButton;
     private Button mSendEmailButton;
+    private String contactEmail;
 
     // WineFragment newInstance() method that will be
     // called when we need a new fragment
@@ -209,15 +212,26 @@ public class WineFragment extends Fragment {
             mContactButton.setText(mWine.getContactName());
         }
 
+        PackageManager packageManager = getActivity().getPackageManager();
+        if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+            mContactButton.setEnabled(false);
+        }
+
         mSendEmailButton = (Button) v.findViewById(R.id.send_email_button);
         mSendEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_SEND);
-                i.setType("text/plain");
-                i.putExtra(Intent.EXTRA_TEXT, getWineReport());
-                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
-                i = Intent.createChooser(i, getString(R.string.send_report));
+
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", contactEmail, null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
+                emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.wine_report));
+                startActivity(Intent.createChooser(emailIntent, "Send report via: "));
+
+//                Intent i = new Intent(Intent.ACTION_SEND);
+//                i.setType("text/plain");
+//                i.putExtra(Intent.EXTRA_TEXT, getWineReport());
+//                i.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
+//                i = Intent.createChooser(i, getString(R.string.send_report));
             }
         });
 
@@ -230,57 +244,63 @@ public class WineFragment extends Fragment {
         if (resultCode != Activity.RESULT_OK) {
             return;
         } else if (requestCode == REQUEST_CONTACT && data != null) {
-            getNameEmailDetails();
-//            Uri contactUri = data.getData();
-//
-//            // Specify which fields we want to return data for
-//            String[] queryFields = new String[] {
-//
-//                    ContactsContract.Contacts.DISPLAY_NAME,
-//
-//            };
-//
-//            Cursor c = getActivity().getContentResolver().query(contactUri, queryFields, null, null, null);
-//
-//
-//            try {
-//                if (c.getCount() == 0) {
-//                    return;
-//                }
-//
-//                c.moveToFirst();
-//                while (!c.isAfterLast()) {
-//                    String contact = c.getString(0);
-//                    mWine.setContactName(contact);
-//                    //mWine.setContactEmail(email);
-//                    mContactButton.setText(contact);
-//                    //mSendEmailButton.setText(email);
-//                }
-//
-//            } finally {
-//                c.close();
-//            }
-        }
-    }
+            Uri contactUri = data.getData();
 
-    public void getNameEmailDetails(){
-        Cursor cur = getActivity().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null, null, null, null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                Cursor cur1 = getActivity().getContentResolver().query(
-                        ContactsContract.CommonDataKinds.Email.CONTENT_URI, null,
-                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
-                        new String[]{id}, null);
-                while (cur1.moveToNext()) {
-                    String name=cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                    mWine.setContactName(name);
-                    mContactButton.setText(name);
-                    String email = cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-                    mWine.setContactEmail(email);
-                    mSendEmailButton.setText(email);
+            // Specify which fields we want to return data for
+            String[] queryFields = new String[] {
+
+                    ContactsContract.Contacts.DISPLAY_NAME,
+                    ContactsContract.Contacts._ID
+
+            };
+
+            ContentResolver contentResolver = getActivity().getContentResolver();
+
+            Cursor c = getActivity().getContentResolver().query(
+                    contactUri,
+                    queryFields,
+                    null,
+                    null,
+                    null
+            );
+
+            Cursor emailCursor = null;
+
+
+            try {
+                if (c.getCount() == 0) {
+                    return;
                 }
-                cur1.close();
+
+                c.moveToFirst();
+                String contact = c.getString(0);
+                String id = c.getString(1);
+
+                String[] emailQueryFields = new String[]{
+                        ContactsContract.CommonDataKinds.Email.DATA
+                };
+
+                emailCursor = contentResolver.query(
+                        ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+                        emailQueryFields,
+                        ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+                        new String[]{id},
+                        null);
+
+                emailCursor.moveToFirst();
+                contactEmail = emailCursor.getString(0);
+                mWine.setContactName(contact);
+                mContactButton.setText(contact);
+                mSendEmailButton.setText(contactEmail);
+            } catch (Exception e) {
+                Log.e("Crime", e.getMessage() + e.getStackTrace());
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+                if (emailCursor != null) {
+                    emailCursor.close();
+                }
             }
         }
     }
