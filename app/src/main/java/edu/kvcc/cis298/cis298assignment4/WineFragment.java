@@ -53,6 +53,7 @@ public class WineFragment extends Fragment {
     private String mContactEmail;
     private String mContactName;
     private String mIsActive;
+    private Boolean mHasContactsApp = true;
     private int mFlag = 0;
 
     // WineFragment newInstance() method that will be
@@ -223,6 +224,7 @@ public class WineFragment extends Fragment {
         PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mContactButton.setEnabled(false);
+            mHasContactsApp = false;
         }
 
         mSendEmailButton = (Button) v.findViewById(R.id.send_email_button);
@@ -230,22 +232,39 @@ public class WineFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mContactEmail, null));
-                Resources emailResources = getResources();
-                if (mWine.isActive() == true) {
-                    mIsActive = emailResources.getString(R.string.wine_is_active);
+                if (mHasContactsApp == false) {
+                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null));
+                    Resources emailResources = getResources();
+                    if (mWine.isActive() == true) {
+                        mIsActive = emailResources.getString(R.string.wine_is_active);
+                    } else {
+                        mIsActive = emailResources.getString(R.string.wine_is_inactive);
+                    }
+                    String wineReport = String.format(emailResources.getString(R.string.wine_report_impersonal), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
+                    startActivity(Intent.createChooser(emailIntent, "Send report via: "));
                 } else {
-                    mIsActive = emailResources.getString(R.string.wine_is_inactive);
+
+                    Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mContactEmail, null));
+                    Resources emailResources = getResources();
+                    if (mWine.isActive() == true) {
+                        mIsActive = emailResources.getString(R.string.wine_is_active);
+                    } else {
+                        mIsActive = emailResources.getString(R.string.wine_is_inactive);
+                    }
+                    String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
+                    emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
+                    emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
+                    startActivity(Intent.createChooser(emailIntent, "Send report via: "));
                 }
-                String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
-                emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
-                startActivity(Intent.createChooser(emailIntent, "Send report via: "));
             }
         });
 
-        if (mWine.getContactName() == null) {
+        if (mWine.getContactName() == null && mHasContactsApp == true) {
+
             mSendEmailButton.setEnabled(false);
+
         }
 
         // return the view

@@ -13,6 +13,7 @@
     <string name="send_email">Send Email</string>
     <string name="send_email_to">Send Email to: %1$s</string>
     <string name="wine_report">%1$s, \n\nPlease verify the following WineList report:\n\nId: %2$s \nName: %3$s \nPack: %4$s \nPrice: %5$s \nActive: %6$s\n\nThanks!</string>
+    <string name="wine_report_impersonal">Please verify the following WineList report:\n\nId: %1$s \nName: %2$s \nPack: %3$s \nPrice: %4$s \nActive: %5$s\n\nThanks!</string>
     <string name="wine_report_subject">WineList Wine Report</string>
     <string name="send_report">Send WineList report via</string>
     <string name="verify_report">Please verify the following WineList report:\n \n</string>
