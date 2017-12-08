@@ -20,6 +20,11 @@ public class WinePagerActivity extends FragmentActivity {
 
     // String to hold our extra
     private static final String EXTRA_WINE_ID = "edu.kvcc.cis298.assignment3.wine_id";
+    // string we will use to store contact name
+    private static final String ARG_CONTACT_NAME = "contact_name";
+
+    // string we will use to store contact email address
+    private static final String ARG_CONTACT_EMAIL_ADDR = "contact_email";
 
     // define the variables for the ViewPager and our winelist
     private ViewPager mViewPager;
@@ -42,6 +47,7 @@ public class WinePagerActivity extends FragmentActivity {
         setContentView(R.layout.activity_wine_pager);
 
         // get the extra from the intent
+
         UUID wineId = (UUID) getIntent().getSerializableExtra(EXTRA_WINE_ID);
 
         // get the widget from the view

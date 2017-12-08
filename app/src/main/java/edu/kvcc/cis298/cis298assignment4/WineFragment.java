@@ -1,6 +1,5 @@
 package edu.kvcc.cis298.cis298assignment4;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +22,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -33,6 +32,12 @@ public class WineFragment extends Fragment {
 
     // string we will use to store the wine Id extra
     private static final String ARG_WINE_ID = "wine_id";
+
+    // string we will use to store contact name
+    private static final String ARG_CONTACT_NAME = "contact_name";
+
+    // string we will use to store contact email address
+    private static final String ARG_CONTACT_EMAIL_ADDR = "contact_email";
 
     // constant for contact request code
     private static final int REQUEST_CONTACT = 1;
@@ -45,7 +50,10 @@ public class WineFragment extends Fragment {
 
     private Button mContactButton;
     private Button mSendEmailButton;
-    private String contactEmail;
+    private String mContactEmail;
+    private String mContactName;
+    private String mIsActive;
+    private int mFlag = 0;
 
     // WineFragment newInstance() method that will be
     // called when we need a new fragment
@@ -73,10 +81,13 @@ public class WineFragment extends Fragment {
 
         // get the string of the wineId from the intent used to start the host activity
         UUID wineId = (UUID) getArguments().getSerializable(ARG_WINE_ID);
+        mContactName = getArguments().getString(ARG_CONTACT_NAME);
+        mContactEmail = getArguments().getString(ARG_CONTACT_EMAIL_ADDR);
 
         // use the singleton to get the wine item with that Id
         mWine = WineShop.get(getActivity()).getWine(wineId);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -219,9 +230,14 @@ public class WineFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", contactEmail, null));
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mContactEmail, null));
                 Resources emailResources = getResources();
-                String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mWine.isActive());
+                if (mWine.isActive() == true) {
+                    mIsActive = emailResources.getString(R.string.wine_is_active);
+                } else {
+                    mIsActive = emailResources.getString(R.string.wine_is_inactive);
+                }
+                String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
                 emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
                 startActivity(Intent.createChooser(emailIntent, "Send report via: "));
@@ -234,6 +250,14 @@ public class WineFragment extends Fragment {
 
         // return the view
         return v;
+    }
+
+    // This gets called twice consecutively and the values always go null the second time. Why???
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+            outState.putString(ARG_CONTACT_NAME, mContactName);
+            outState.putString(ARG_CONTACT_EMAIL_ADDR, mContactEmail);
     }
 
     @Override
@@ -285,13 +309,17 @@ public class WineFragment extends Fragment {
                         null);
 
                 emailCursor.moveToFirst();
-                contactEmail = emailCursor.getString(0);
+                Resources stringResources = getResources();
+                mContactEmail = emailCursor.getString(0);
+                mContactName = contact;
                 mWine.setContactName(contact);
-                mContactButton.setText(contact);
-                mSendEmailButton.setText(contactEmail);
+                String contactButtonText = String.format(stringResources.getString(R.string.send_email_to), contact);
+                mContactButton.setText(contactButtonText);
+                mSendEmailButton.setText(mContactEmail);
                 if (mWine.getContactName() != null) {
                     mSendEmailButton.setEnabled(true);
                 }
+
             } catch (Exception e) {
                 Log.e("Crime", e.getMessage() + e.getStackTrace());
             } finally {

@@ -6,11 +6,14 @@
     <string name="wine_pack_label">Pack:</string>
     <string name="wine_price_label">Price:</string>
     <string name="wine_active_label">Active:</string>
+    <string name="wine_is_active">Yes</string>
+    <string name="wine_is_inactive">No</string>
     <string name="dollar_sign">$</string>
     <string name="select_contact">Select Contact</string>
     <string name="send_email">Send Email</string>
-    <string name="wine_report">%1$s, \n\nPlease verify the following WineList report:\n\nId: %2$s \nName: %3$s \nPack: %4$s \nPrice: %5$s \nActive: %6$b\n\nThanks!</string>
+    <string name="send_email_to">Send Email to: %1$s</string>
+    <string name="wine_report">%1$s, \n\nPlease verify the following WineList report:\n\nId: %2$s \nName: %3$s \nPack: %4$s \nPrice: %5$s \nActive: %6$s\n\nThanks!</string>
     <string name="wine_report_subject">WineList Wine Report</string>
     <string name="send_report">Send WineList report via</string>
-    <string name="verify_report">Pleasw verify the following WineList report:\n \n</string>
+    <string name="verify_report">Please verify the following WineList report:\n \n</string>
 </resources>
