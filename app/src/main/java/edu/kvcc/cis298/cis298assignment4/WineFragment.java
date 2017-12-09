@@ -52,9 +52,13 @@ public class WineFragment extends Fragment {
     private Button mSendEmailButton;
     private String mContactEmail;
     private String mContactName;
+
+    // string to hold the prettified version of the isActive property of a WineItem
+    // (this is used in the string supplied to the body of an email)
     private String mIsActive;
+
+    // flag to tell us whether we have a contacts app
     private Boolean mHasContactsApp = true;
-    private int mFlag = 0;
 
     // WineFragment newInstance() method that will be
     // called when we need a new fragment
@@ -212,40 +216,65 @@ public class WineFragment extends Fragment {
             }
         });
 
+        // create an implicit intent to select a contact
         final Intent pickContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+
+        // get the widget
         mContactButton = (Button) v.findViewById(R.id.select_contact_button);
+
+        // set a listener
         mContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // start an activity to select a contact
                 startActivityForResult(pickContact, REQUEST_CONTACT);
             }
         });
 
+        // get the packagemanager activity so we can check if an app is present
         PackageManager packageManager = getActivity().getPackageManager();
+
+        // check for a default contacts app to see if it is null (aka missing)
         if (packageManager.resolveActivity(pickContact, PackageManager.MATCH_DEFAULT_ONLY) == null) {
+
+            // if null, disable the select contact button and set the mHasContactsApp flag to false
             mContactButton.setEnabled(false);
             mHasContactsApp = false;
         }
 
+        // get widget
         mSendEmailButton = (Button) v.findViewById(R.id.send_email_button);
+
+        // set listener
         mSendEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // RESTRUCTURE THIS CODE FOR BREVITY
+                // Check for a false flag. If false, create an email intent that has no recipient
                 if (mHasContactsApp == false) {
                     Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", "", null));
                     Resources emailResources = getResources();
+
+                    // make the "currently active" string pretty
                     if (mWine.isActive() == true) {
                         mIsActive = emailResources.getString(R.string.wine_is_active);
                     } else {
                         mIsActive = emailResources.getString(R.string.wine_is_inactive);
                     }
+
+                    // get the impersonal version of the wine report
                     String wineReport = String.format(emailResources.getString(R.string.wine_report_impersonal), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
+
+                    // put the extras for the subject and text
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
                     emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
+
+                    // start the chooser activity for an email client
                     startActivity(Intent.createChooser(emailIntent, "Send report via: "));
                 } else {
 
+                    // if there's a true flag, create a new intent for an email and supply the personalized information for the message
                     Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", mContactEmail, null));
                     Resources emailResources = getResources();
                     if (mWine.isActive() == true) {
@@ -253,6 +282,8 @@ public class WineFragment extends Fragment {
                     } else {
                         mIsActive = emailResources.getString(R.string.wine_is_inactive);
                     }
+
+                    // get the personalized version of the string resource for the email subject and body
                     String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
                     emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
@@ -261,13 +292,14 @@ public class WineFragment extends Fragment {
             }
         });
 
+        // check to determine whether we should disable the "send email" button. This should only be
+        // disabled is there is a default contacts app present
         if (mWine.getContactName() == null && mHasContactsApp == true) {
 
             mSendEmailButton.setEnabled(false);
 
         }
 
-        // return the view
         return v;
     }
 
