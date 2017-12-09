@@ -35,22 +35,6 @@ public class WineItem {
     // getters and setters for the variables
 
 
-    public String getContactEmail() {
-        return mContactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        mContactEmail = contactEmail;
-    }
-
-    public String getContactName() {
-        return mContactName;
-    }
-
-    public void setContactName(String contactName) {
-        mContactName = contactName;
-    }
-
     public UUID getUUID() {
         return mUUID;
     }

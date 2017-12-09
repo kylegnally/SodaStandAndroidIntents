@@ -32,12 +32,8 @@ public class WineFragment extends Fragment {
 
     // string we will use to store the wine Id extra
     private static final String ARG_WINE_ID = "wine_id";
-
-    // string we will use to store contact name
     private static final String ARG_CONTACT_NAME = "contact_name";
-
-    // string we will use to store contact email address
-    private static final String ARG_CONTACT_EMAIL_ADDR = "contact_email";
+    private static final String ARG_CONTACT_EMAIL = "contact_email";
 
     // constant for contact request code
     private static final int REQUEST_CONTACT = 1;
@@ -86,13 +82,10 @@ public class WineFragment extends Fragment {
 
         // get the string of the wineId from the intent used to start the host activity
         UUID wineId = (UUID) getArguments().getSerializable(ARG_WINE_ID);
-        mContactName = getArguments().getString(ARG_CONTACT_NAME);
-        mContactEmail = getArguments().getString(ARG_CONTACT_EMAIL_ADDR);
 
         // use the singleton to get the wine item with that Id
         mWine = WineShop.get(getActivity()).getWine(wineId);
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -284,7 +277,7 @@ public class WineFragment extends Fragment {
                     }
 
                     // get the personalized version of the string resource for the email subject and body
-                    String wineReport = String.format(emailResources.getString(R.string.wine_report), mWine.getContactName(), mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
+                    String wineReport = String.format(emailResources.getString(R.string.wine_report), mContactName, mWine.getId(), mWine.getName(), mWine.getPack(), mWine.getPrice(), mIsActive);
                     emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.wine_report_subject));
                     emailIntent.putExtra(Intent.EXTRA_TEXT, wineReport);
                     startActivity(Intent.createChooser(emailIntent, "Send report via: "));
@@ -294,7 +287,7 @@ public class WineFragment extends Fragment {
 
         // check to determine whether we should disable the "send email" button. This should only be
         // disabled is there is a default contacts app present
-        if (mWine.getContactName() == null && mHasContactsApp == true) {
+        if (mContactName == null && mHasContactsApp == true) {
 
             mSendEmailButton.setEnabled(false);
 
@@ -303,13 +296,14 @@ public class WineFragment extends Fragment {
         return v;
     }
 
-    // This gets called twice consecutively and the values always go null the second time. Why???
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-            outState.putString(ARG_CONTACT_NAME, mContactName);
-            outState.putString(ARG_CONTACT_EMAIL_ADDR, mContactEmail);
+        outState.putString(ARG_CONTACT_NAME, mContactName);
+        outState.putString(ARG_CONTACT_EMAIL, mContactEmail);
     }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -363,16 +357,15 @@ public class WineFragment extends Fragment {
                 Resources stringResources = getResources();
                 mContactEmail = emailCursor.getString(0);
                 mContactName = contact;
-                mWine.setContactName(contact);
                 String contactButtonText = String.format(stringResources.getString(R.string.send_email_to), contact);
                 mContactButton.setText(contactButtonText);
                 mSendEmailButton.setText(mContactEmail);
-                if (mWine.getContactName() != null) {
+                if (mContactName != null) {
                     mSendEmailButton.setEnabled(true);
                 }
 
             } catch (Exception e) {
-                Log.e("Crime", e.getMessage() + e.getStackTrace());
+                Log.e("Wine", e.getMessage() + e.getStackTrace());
             } finally {
                 if (c != null) {
                     c.close();
