@@ -16,10 +16,6 @@ public class WineItem {
     private String mPrice;
     private boolean mIsActive;
 
-    // member variables for the selected contact
-    private String mContactName;
-    private String mContactEmail;
-
     // Constructor for this class. Takes four string and a bool
     public WineItem(String id, String name, String pack, String price, Boolean active) {
 
@@ -37,10 +33,6 @@ public class WineItem {
 
     public UUID getUUID() {
         return mUUID;
-    }
-
-    public void setUUID(UUID UUID) {
-        mUUID = UUID;
     }
 
     public String getId() {

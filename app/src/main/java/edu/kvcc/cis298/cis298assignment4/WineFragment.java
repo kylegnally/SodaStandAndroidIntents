@@ -32,6 +32,9 @@ public class WineFragment extends Fragment {
 
     // string we will use to store the wine Id extra
     private static final String ARG_WINE_ID = "wine_id";
+
+    // these would be used to store the contact name and email extras if they
+    // didn't become null in onSaveInstanceState()
     private static final String ARG_CONTACT_NAME = "contact_name";
     private static final String ARG_CONTACT_EMAIL = "contact_email";
 
@@ -44,8 +47,11 @@ public class WineFragment extends Fragment {
     // variable to hold an instance of the WineItem object
     private WineItem mWine;
 
+    // widgets
     private Button mContactButton;
     private Button mSendEmailButton;
+
+    // strings to hold the contact name and email address
     private String mContactEmail;
     private String mContactName;
 
@@ -72,8 +78,8 @@ public class WineFragment extends Fragment {
         // set the arguments, passing it args (which holds the wineId)
         fragment.setArguments(args);
 
-        // return the fragment
         return fragment;
+
     }
 
     @Override
@@ -296,6 +302,7 @@ public class WineFragment extends Fragment {
         return v;
     }
 
+    // This gets called twice and both extras become null the second time. Why??
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -320,8 +327,10 @@ public class WineFragment extends Fragment {
 
             };
 
+            // create an instance of the ContentResolver
             ContentResolver contentResolver = getActivity().getContentResolver();
 
+            // instantiate a cursor, passing it the contactUri and the query fields
             Cursor c = getActivity().getContentResolver().query(
                     contactUri,
                     queryFields,
@@ -330,22 +339,28 @@ public class WineFragment extends Fragment {
                     null
             );
 
+
             Cursor emailCursor = null;
 
-
+            // if there's nothing in there just return
             try {
                 if (c.getCount() == 0) {
                     return;
                 }
 
+                // move to the start and get the columns in the DB we will use
                 c.moveToFirst();
                 String contact = c.getString(0);
                 String id = c.getString(1);
 
+                // set them email query field params
                 String[] emailQueryFields = new String[]{
                         ContactsContract.CommonDataKinds.Email.DATA
                 };
 
+                // create the query, using the content_uri as the URI string
+                // and the contact_id for the selection parameter, and match the selection
+                // to the id stored in a new string array
                 emailCursor = contentResolver.query(
                         ContactsContract.CommonDataKinds.Email.CONTENT_URI,
                         emailQueryFields,
@@ -353,20 +368,31 @@ public class WineFragment extends Fragment {
                         new String[]{id},
                         null);
 
+                // move the email cursor to the beginning and get the results from the
+                // specified coloumn
                 emailCursor.moveToFirst();
                 Resources stringResources = getResources();
                 mContactEmail = emailCursor.getString(0);
                 mContactName = contact;
-                String contactButtonText = String.format(stringResources.getString(R.string.send_email_to), contact);
-                mContactButton.setText(contactButtonText);
+
+                // set the contact button text to a nicely formatted string containing our
+                // invitation to send to the selected contact
+                mContactButton.setText(String.format(stringResources.getString(R.string.send_email_to), contact));
+
+                // and show the user the address they'll send to
                 mSendEmailButton.setText(mContactEmail);
+
+                // enable the email button if the contact name is not null
                 if (mContactName != null) {
                     mSendEmailButton.setEnabled(true);
                 }
 
+            // catch an exception and log it just in case
             } catch (Exception e) {
                 Log.e("Wine", e.getMessage() + e.getStackTrace());
             } finally {
+
+                // close the cursors
                 if (c != null) {
                     c.close();
                 }

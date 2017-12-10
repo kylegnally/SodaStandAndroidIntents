@@ -201,11 +201,14 @@ public class WineListFragment extends Fragment {
 
     private class FetchWinesTask extends AsyncTask<Void,Void,ArrayList<WineItem>> {
 
+        // fetch the wines in a background task
         @Override
         protected ArrayList<WineItem> doInBackground(Void... voids) {
             return new WineFetcher().fetchWines();
         }
 
+        // after we get the wines into the array, get the activity, singleton, and set
+        // up the adapter
         @Override
         protected void onPostExecute(ArrayList<WineItem> wineItems) {
             WineShop shop = WineShop.get(getActivity());

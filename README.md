@@ -2,6 +2,7 @@
 ## Due 12-11-2017
 ## Author
 
+Kyle Nally
 
 
 ## Description
@@ -85,11 +86,15 @@ Setup a SQLite database to maintain the information for the Beverages. When the 
 The application must do all of the above work to get the extra credit. In order to satisfy the web service grading part of the assignment, the application must either load the Beverage data from the web service when the application starts up (no database), or load the Beverage data when the database is created (with database). If there is no web service functionality for one of those two features, then you can not get any points for that section of grading.
 
 ## Outside Resources Used
-
-
+Stack Overflow, "Send Email Intent", Padma Kumar et al., https://stackoverflow.com/questions/8701634/send-email-intent
+"Sending Email from Android app when click on a button", Amardeepvijay et al., https://stackoverflow.com/questions/21720640/sending-email-from-android-app-when-click-on-button
 
 ## Known Problems, Issues, And/Or Errors in the Program
+1) On a real device, the contacts app will not return any contact information even when using the Google contacts app.
+Verified on Galaxy S7, Galaxy S7 Edge, LG Tracfone
 
+2) Screen rotation is not properly handled because onSaveInstanceState() gets called twice and extras are null on the second call.
+RELATED: after screen rotation buttons are not properly enabled/disabled, resulting in a crash if the "send email" button is then touched.
 
 
 # Original Assignment README
